@@ -1,0 +1,572 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@400;500;600;700;800&display=swap");
+
+:root {
+  /* Brand Sjednej.cz (z brand manuálu) */
+  --bg: #081b27;
+  --bg-card: #ffffff;
+  --ink: #2c2e35;
+  --muted: #6b7280;
+  --brand: #2ea8de;
+  --brand-dark: #1b87bb;
+  --good: #16a34a;
+  --good-bg: #ecfdf5;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --border: #e3eef4;
+  --radius: 16px;
+  --font-head: "Bebas Neue", "Arial Narrow", Arial, sans-serif;
+  --font-body: "Raleway", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: radial-gradient(1200px 600px at 50% -10%, #0e5d85 0%, var(--bg) 60%);
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 22px 20px 28px;
+}
+
+.hero {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.brand-logo {
+  height: 28px;
+  width: auto;
+  margin-bottom: 8px;
+}
+.hero h1 {
+  font-family: var(--font-head);
+  font-size: 36px;
+  line-height: 1.02;
+  margin: 0 0 6px;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+.hero p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 15px;
+}
+.hero .switch {
+  margin-top: 14px;
+  font-size: 15px;
+  color: #94a3b8;
+}
+.hero .switch a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+.hero .switch a:hover {
+  border-bottom-color: #fff;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 50px rgba(2, 6, 23, 0.35);
+  padding: 20px 24px;
+}
+
+.steps {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.dot {
+  width: 28px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+}
+.dot.active {
+  background: var(--brand);
+}
+.dot.done {
+  background: var(--good);
+}
+
+/* Nadpisy v brandovém písmu (Bebas Neue) */
+.card h3 {
+  font-family: var(--font-head);
+  font-weight: 400;
+  letter-spacing: 0.6px;
+  font-size: 24px;
+}
+.drop h3 {
+  font-size: 22px;
+}
+
+/* Dropzone */
+.drop {
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--radius);
+  padding: 26px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: #f8fafc;
+}
+.drop:hover,
+.drop.over {
+  border-color: var(--brand);
+  background: #eff6ff;
+}
+.drop .icon {
+  font-size: 30px;
+}
+.drop h3 {
+  margin: 10px 0 4px;
+  font-size: 18px;
+}
+.drop p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.filename {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+  appearance: none;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.05s, background 0.15s, opacity 0.15s;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--brand-dark);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  width: auto;
+  padding: 10px 4px;
+}
+.btn-good {
+  background: var(--brand);
+  color: #fff;
+}
+.btn-good:hover:not(:disabled) {
+  background: var(--brand-dark);
+}
+.btn-outline {
+  background: #fff;
+  color: var(--brand-dark);
+  border: 1.5px solid var(--brand);
+}
+.btn-outline:hover:not(:disabled) {
+  background: var(--brand-tint, #eaf6fc);
+}
+
+/* Oddělovač "nebo" mezi nahráním a ručním zadáním */
+.or {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin: 9px 0;
+  gap: 12px;
+}
+.or::before,
+.or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.mt {
+  margin-top: 12px;
+}
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Form fields */
+label.field {
+  display: block;
+  margin-bottom: 14px;
+}
+label.field span {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+input.inp {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--ink);
+  background: #fff;
+}
+input.inp:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+}
+
+/* Našeptávač adres */
+.ac-wrap {
+  position: relative;
+}
+.ac-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 4px;
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(8, 11, 13, 0.16);
+  max-height: 232px;
+  overflow-y: auto;
+}
+.ac-item {
+  padding: 9px 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ac-item.hi,
+.ac-item:hover {
+  background: #eaf6fc;
+}
+
+/* Result */
+.savings {
+  text-align: center;
+  padding: 12px 0 6px;
+}
+.savings .label {
+  color: var(--muted);
+  font-size: 15px;
+}
+.savings .amount {
+  font-family: var(--font-head);
+  font-size: 54px;
+  font-weight: 400;
+  color: var(--brand-dark);
+  letter-spacing: 1px;
+  margin: 6px 0;
+}
+/* Odhalená částka, když je co řešit – tučně červeně */
+.savings .amount.red {
+  color: #dc2626;
+  font-weight: 800;
+}
+.savings .sub {
+  color: var(--muted);
+  font-size: 14px;
+}
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+.badge.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.facts {
+  margin-top: 22px;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+}
+.fact .k {
+  font-size: 12px;
+  color: var(--muted);
+}
+.fact .v {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Přehled krytí (stavba / domácnost) */
+.cover {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.chip {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+.chip.on {
+  background: var(--good-bg);
+  color: var(--good);
+  border-color: #bbf7d0;
+}
+.chip.off {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* Doporučení – co doplnit */
+.recos {
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.recos-title {
+  font-family: var(--font-head);
+  letter-spacing: 0.5px;
+  font-size: 18px;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.reco {
+  background: var(--warn-bg);
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 18px auto;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.center {
+  text-align: center;
+}
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+.err {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  margin-top: 14px;
+}
+.success-icon {
+  font-size: 56px;
+  text-align: center;
+}
+.legal {
+  color: #94a3b8;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Maskot Bodlík + slogan – uvítací prvek v hlavičce (vystředěný) */
+.bodlik-badge {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  pointer-events: none;
+}
+.bodlik-img {
+  height: 96px;
+  width: auto;
+  filter: drop-shadow(0 10px 18px rgba(8, 11, 13, 0.4));
+}
+.bodlik-slogan {
+  position: relative;
+  margin-bottom: 28px;
+  background: #fff;
+  color: var(--brand-dark);
+  font-family: var(--font-head);
+  letter-spacing: 0.6px;
+  font-size: 17px;
+  line-height: 1.05;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 22px rgba(8, 11, 13, 0.18);
+}
+/* špička bubliny směrem k Bodlíkovi */
+.bodlik-slogan::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  bottom: 16px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  transform: rotate(-45deg);
+}
+/* Na malých displejích Bodlíka zmenši, ať se vejde do hlavičky. */
+@media (max-width: 480px) {
+  .bodlik-img {
+    height: 110px;
+  }
+  .bodlik-slogan {
+    font-size: 16px;
+  }
+}
+
+/* ===== Bodlíkův rentgen – přepínač kalkulaček ===== */
+.rentgen-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.rentgen-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.rentgen-tab:hover { border-color: var(--brand, #2ea8de); }
+.rentgen-tab.active {
+  border-color: var(--brand, #2ea8de);
+  box-shadow: 0 0 0 2px rgba(46, 168, 222, .18);
+}
+.rentgen-tab-emoji { font-size: 26px; line-height: 1; }
+.rentgen-tab-label { font-weight: 700; font-size: 14px; }
+.rentgen-tab-desc { font-size: 12px; color: var(--muted, #6b7280); }
+
+/* Vnořené kalkulačky – skryjeme jejich vlastní hlavičku, společná je jen jedna */
+.embedded .hero { display: none; }
+.embedded .wrap {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 560px) {
+  .rentgen-tabs { grid-template-columns: 1fr; }
+  .rentgen-tab { flex-direction: row; justify-content: flex-start; gap: 10px; text-align: left; }
+  .rentgen-tab-desc { display: none; }
+}
+
+/* Maskot Bodlík uvnitř vnořených kalkulaček skryjeme – v rentgenu je jeden společný v hlavičce */
+.embedded .bodlik-badge { display: none; }
+
+/* Patička s odkazy na Sjednej.cz (na tmavém pozadí stránky) */
+.site-footer {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+.footer-logo {
+  height: 22px;
+  width: auto;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.footer-links a {
+  color: #cbd5e1;
+  font-size: 13px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+.footer-links a:hover {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+.footer-copy {
+  font-size: 12px;
+  color: #64748b;
+}
