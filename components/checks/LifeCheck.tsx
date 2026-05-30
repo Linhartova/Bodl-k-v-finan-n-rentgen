@@ -470,6 +470,7 @@ export default function LifeCheck() {
             score={scoreLife(life, result)}
             doneMsg={doneMsg}
             onReset={reset}
+            kontakt={{ jmeno: form.jmeno, email: form.email, telefon: formatPhone(form.predvolba, form.telefon) }}
           />
         )}
       </div>

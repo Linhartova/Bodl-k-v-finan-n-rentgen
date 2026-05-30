@@ -1,0 +1,125 @@
+import { NextRequest, NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+
+export const runtime = "nodejs";
+
+// Žádost o bezplatnou konzultaci z výsledkové stránky (po zobrazení skóre).
+interface KonzultaceReq {
+  jmeno: string;
+  email: string;
+  telefon: string;
+  produkt: string; // "uver" | "nemovitost" | "zivot" – odkud žádost přišla
+  termin: string; // preferovaný termín hovoru (volný text / select)
+  zprava: string; // nepovinná poznámka klienta
+}
+
+function validate(d: Partial<KonzultaceReq>): string | null {
+  if (!d?.jmeno || d.jmeno.trim().length < 2) return "Vyplň prosím jméno.";
+  if (!d?.telefon && !d?.email) return "Vyplň prosím telefon nebo e-mail.";
+  if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) return "E-mail nemá platný formát.";
+  return null;
+}
+
+const PRODUKT_NAZEV: Record<string, string> = {
+  uver: "úvěr / hypotéka",
+  nemovitost: "pojištění nemovitosti",
+  zivot: "životní pojištění",
+};
+
+async function saveLocally(d: KonzultaceReq) {
+  const dir = path.join(process.cwd(), "data");
+  const file = path.join(dir, "konzultace.json");
+  await fs.mkdir(dir, { recursive: true });
+  let existing: any[] = [];
+  try {
+    existing = JSON.parse(await fs.readFile(file, "utf8"));
+  } catch {
+    existing = [];
+  }
+  existing.push({ ...d, ulozeno: new Date().toISOString() });
+  await fs.writeFile(file, JSON.stringify(existing, null, 2), "utf8");
+}
+
+function popis(d: KonzultaceReq): string {
+  return [
+    `Žádost o bezplatnou konzultaci`,
+    `Oblast: ${PRODUKT_NAZEV[d.produkt] ?? d.produkt ?? "—"}`,
+    `Preferovaný termín hovoru: ${d.termin || "neuvedeno"}`,
+    d.zprava ? `Zpráva: ${d.zprava}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+async function sendToPipedrive(d: KonzultaceReq): Promise<{ leadId: string }> {
+  const token = process.env.PIPEDRIVE_API_TOKEN!;
+  const domain = process.env.PIPEDRIVE_DOMAIN!;
+  const base = `https://${domain}.pipedrive.com/api/v1`;
+  const q = `api_token=${encodeURIComponent(token)}`;
+
+  const personRes = await fetch(`${base}/persons?${q}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: d.jmeno,
+      email: d.email ? [{ value: d.email, primary: true }] : undefined,
+      phone: d.telefon ? [{ value: d.telefon, primary: true }] : undefined,
+    }),
+  });
+  const personJson = await personRes.json();
+  if (!personRes.ok || !personJson?.data?.id) {
+    throw new Error(`Pipedrive person: ${personJson?.error || personRes.status}`);
+  }
+  const personId = personJson.data.id;
+
+  const titulek = `Konzultace zdarma – ${d.jmeno} (${PRODUKT_NAZEV[d.produkt] ?? d.produkt})`;
+  const leadRes = await fetch(`${base}/leads?${q}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title: titulek, person_id: personId }),
+  });
+  const leadJson = await leadRes.json();
+  if (!leadRes.ok || !leadJson?.data?.id) {
+    throw new Error(`Pipedrive lead: ${leadJson?.error || leadRes.status}`);
+  }
+  const leadId = leadJson.data.id as string;
+
+  try {
+    await fetch(`${base}/notes?${q}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lead_id: leadId, content: popis(d).replace(/\n/g, "<br>") }),
+    });
+  } catch {
+    /* ignore */
+  }
+
+  return { leadId };
+}
+
+export async function POST(req: NextRequest) {
+  let d: KonzultaceReq;
+  try {
+    d = (await req.json()) as KonzultaceReq;
+  } catch {
+    return NextResponse.json({ error: "Neplatná data." }, { status: 400 });
+  }
+
+  const err = validate(d);
+  if (err) return NextResponse.json({ error: err }, { status: 400 });
+
+  const hasPipedrive = !!process.env.PIPEDRIVE_API_TOKEN && !!process.env.PIPEDRIVE_DOMAIN;
+
+  if (!hasPipedrive) {
+    await saveLocally(d);
+    return NextResponse.json({ ok: true, mode: "local" }, { status: 200 });
+  }
+  try {
+    const { leadId } = await sendToPipedrive(d);
+    return NextResponse.json({ ok: true, mode: "pipedrive", leadId }, { status: 200 });
+  } catch (e: any) {
+    await saveLocally(d);
+    return NextResponse.json({ ok: true, mode: "local-fallback" }, { status: 200 });
+  }
+}

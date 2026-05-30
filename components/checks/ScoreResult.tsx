@@ -1,18 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import type { ScoreResult } from "@/lib/score";
 import { pasmoSkore, formatKc } from "@/lib/score";
 
 // Společný výstup analýzy: Bodlíkovo finanční skóre + spící peníze + rizika
-// + doporučení + CTA na konzultaci. Sdílí ho úvěr, nemovitost i životní pojištění.
+// + doporučení + formulář pro bezplatnou konzultaci.
+// Sdílí ho úvěr, nemovitost i životní pojištění.
 export default function ScoreResultView({
   score,
   doneMsg,
   onReset,
+  kontakt,
 }: {
   score: ScoreResult;
   doneMsg: string;
   onReset: () => void;
+  // Předvyplnění z lead formu (jméno + telefon/e-mail), ať klient nepíše dvakrát.
+  kontakt?: { jmeno?: string; email?: string; telefon?: string };
 }) {
   const pasmo = pasmoSkore(score.score);
   const pasmoLabel = pasmo === "good" ? "Dobré" : pasmo === "warn" ? "Co zlepšit" : "Pozor";
@@ -25,6 +30,39 @@ export default function ScoreResultView({
   const R = 52;
   const C = 2 * Math.PI * R;
   const dash = (score.score / 100) * C;
+
+  // --- Formulář konzultace ---
+  const [form, setForm] = useState({
+    jmeno: kontakt?.jmeno ?? "",
+    email: kontakt?.email ?? "",
+    telefon: kontakt?.telefon ?? "",
+    termin: "Kdykoliv",
+    zprava: "",
+  });
+  const [sending, setSending] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+
+  async function odeslat() {
+    setErr(null);
+    if (form.jmeno.trim().length < 2) return setErr("Vyplň prosím jméno.");
+    if (!form.telefon && !form.email) return setErr("Vyplň prosím telefon nebo e-mail.");
+    setSending(true);
+    try {
+      const res = await fetch("/api/konzultace", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, produkt: score.produkt }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || "Nepodařilo se odeslat.");
+      setSent(true);
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setSending(false);
+    }
+  }
 
   return (
     <div className="result-view">
@@ -104,33 +142,90 @@ export default function ScoreResultView({
         </div>
       )}
 
-      {/* Potvrzení + konzultace */}
+      {/* Konzultace – formulář */}
       <div className="consult">
-        <div className="success-icon">✅</div>
-        <p className="muted" style={{ marginTop: 0 }}>
-          {doneMsg}
-        </p>
-        <a
-          className="btn btn-good"
-          href="https://www.sjednej.cz/kontakt"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Chci bezplatnou konzultaci
-        </a>
-        <a
-          className="btn btn-outline mt"
-          href="https://www.sjednej.cz/kontakt"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Nechat zavolat specialistou
-        </a>
-        <div className="center">
-          <button className="btn btn-ghost" onClick={onReset}>
-            Zkontrolovat další smlouvu
-          </button>
-        </div>
+        {sent ? (
+          <div className="center">
+            <div className="success-icon">✅</div>
+            <h3 style={{ marginTop: 0 }}>Děkujeme!</h3>
+            <p className="muted">
+              Specialista Sjednej Finance se ti ozve v preferovaném čase a doporučení projde zdarma.
+            </p>
+            <button className="btn btn-ghost" onClick={onReset}>
+              Zkontrolovat další smlouvu
+            </button>
+          </div>
+        ) : (
+          <>
+            <h3 style={{ marginTop: 0 }}>Chci bezplatnou konzultaci</h3>
+            <p className="muted" style={{ marginTop: -6 }}>
+              Specialista ti doporučení nezávazně projde a navrhne řešení na míru.
+            </p>
+            <label className="field">
+              <span>Jméno a příjmení</span>
+              <input
+                className="inp"
+                value={form.jmeno}
+                onChange={(e) => setForm({ ...form, jmeno: e.target.value })}
+                placeholder="Jan Novák"
+              />
+            </label>
+            <div className="grid2">
+              <label className="field">
+                <span>Telefon</span>
+                <input
+                  className="inp"
+                  inputMode="tel"
+                  value={form.telefon}
+                  onChange={(e) => setForm({ ...form, telefon: e.target.value })}
+                  placeholder="+420 777 123 456"
+                />
+              </label>
+              <label className="field">
+                <span>E-mail</span>
+                <input
+                  className="inp"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="jan@email.cz"
+                />
+              </label>
+            </div>
+            <label className="field">
+              <span>Kdy se ti hodí zavolat?</span>
+              <select
+                className="inp"
+                value={form.termin}
+                onChange={(e) => setForm({ ...form, termin: e.target.value })}
+              >
+                <option>Kdykoliv</option>
+                <option>Dopoledne (9–12)</option>
+                <option>Odpoledne (12–17)</option>
+                <option>Podvečer (17–20)</option>
+              </select>
+            </label>
+            <label className="field">
+              <span>Zpráva (nepovinné)</span>
+              <input
+                className="inp"
+                value={form.zprava}
+                onChange={(e) => setForm({ ...form, zprava: e.target.value })}
+                placeholder="Na co se chceš zeptat?"
+              />
+            </label>
+
+            {err && <div className="err">{err}</div>}
+            <button className="btn btn-good mt" disabled={sending} onClick={odeslat}>
+              {sending ? "Odesílám…" : "Chci bezplatnou konzultaci"}
+            </button>
+            <div className="center">
+              <button className="btn btn-ghost" onClick={onReset}>
+                Zkontrolovat další smlouvu
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

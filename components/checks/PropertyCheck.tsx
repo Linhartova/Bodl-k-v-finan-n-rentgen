@@ -409,6 +409,7 @@ export default function PropertyCheck() {
             score={scoreProperty(ins, result)}
             doneMsg={doneMsg}
             onReset={reset}
+            kontakt={{ jmeno: form.jmeno, email: form.email, telefon: formatPhone(form.predvolba, form.telefon) }}
           />
         )}
       </div>

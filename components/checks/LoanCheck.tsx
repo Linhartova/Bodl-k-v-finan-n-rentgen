@@ -335,6 +335,7 @@ export default function LoanCheck() {
             score={scoreLoan(loan, savings)}
             doneMsg={doneMsg}
             onReset={reset}
+            kontakt={{ jmeno: form.jmeno, email: form.email, telefon: formatPhone(form.predvolba, form.telefon) }}
           />
         )}
       </div>
