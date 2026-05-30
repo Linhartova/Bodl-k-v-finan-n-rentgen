@@ -4,7 +4,7 @@ import type { LifeLead } from "./types";
 import { formatKc } from "./calc";
 import {
   BRAND,
-  FROM,
+  fromWithName,
   REPLY_TO,
   header,
   logoAttachments,
@@ -139,7 +139,7 @@ export async function sendLifeConfirmationEmail(lead: LifeLead): Promise<EmailRe
     const h = headline(lead);
     const mezera = lead.result.celkovaMezera > 0;
     const { data, error } = await resend.emails.send({
-      from: FROM,
+      from: fromWithName("Kontrola životního pojištění"),
       to: lead.email,
       ...(REPLY_TO ? { replyTo: REPLY_TO } : {}),
       ...(attachments ? { attachments } : {}),

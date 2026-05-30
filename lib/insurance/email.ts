@@ -4,7 +4,7 @@ import type { InsuranceLead } from "./types";
 import { formatKc } from "./calc";
 import {
   BRAND,
-  FROM,
+  fromWithName,
   REPLY_TO,
   header,
   logoAttachments,
@@ -117,7 +117,7 @@ export async function sendInsuranceConfirmationEmail(lead: InsuranceLead): Promi
   try {
     const podpoj = lead.result.podpojisteny && lead.result.ztrataProKlienta;
     const { data, error } = await resend.emails.send({
-      from: FROM,
+      from: fromWithName("Kontrola pojištění nemovitosti"),
       to: lead.email,
       ...(REPLY_TO ? { replyTo: REPLY_TO } : {}),
       ...(attachments ? { attachments } : {}),

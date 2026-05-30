@@ -4,7 +4,7 @@ import type { Lead } from "./types";
 import { formatKc } from "./savings";
 import {
   BRAND,
-  FROM,
+  fromWithName,
   REPLY_TO,
   header,
   logoAttachments,
@@ -108,7 +108,7 @@ export async function sendConfirmationEmail(lead: Lead): Promise<EmailResult> {
   const attachments = logoAttachments();
   try {
     const { data, error } = await resend.emails.send({
-      from: FROM,
+      from: fromWithName("Kontrola úvěru"),
       to: lead.email,
       ...(REPLY_TO ? { replyTo: REPLY_TO } : {}),
       ...(attachments ? { attachments } : {}),

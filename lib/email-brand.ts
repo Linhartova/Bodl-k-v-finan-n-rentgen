@@ -9,6 +9,16 @@ import { join } from "path";
 export const FROM = process.env.EMAIL_FROM || "Sjednej.cz <onboarding@resend.dev>";
 export const REPLY_TO = process.env.EMAIL_REPLY_TO; // volitelné
 
+// Sestaví odesílatele se zobrazovaným jménem podle typu kontroly, ale se stejnou
+// e-mailovou adresou jako FROM. Díky tomu klient v schránce vidí "Kontrola úvěru"
+// / "Kontrola pojištění nemovitosti" / "Kontrola životního pojištění" podle toho,
+// co zadal – ne vždy "Kontrola úvěru".
+export function fromWithName(displayName: string): string {
+  const m = FROM.match(/<([^>]+)>/);
+  const addr = m ? m[1].trim() : FROM.trim();
+  return `${displayName} <${addr}>`;
+}
+
 // --- Brand Sjednej.cz (z brand manuálu) ---
 export const BRAND = {
   blue: "#2ea8de",
