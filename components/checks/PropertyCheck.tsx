@@ -3,9 +3,12 @@
 import { useMemo, useRef, useState } from "react";
 import type { ExtractedInsurance, InsuranceResult, InsuranceLead } from "@/lib/insurance/types";
 import { analyzeInsurance, formatKc } from "@/lib/insurance/calc";
+import { scoreProperty } from "@/lib/score";
 import BodlikBadge from "@/components/BodlikBadge";
-import PhoneField, { formatPhone, VYCHOZI_PREDVOLBA } from "@/components/PhoneField";
+import { formatPhone, VYCHOZI_PREDVOLBA } from "@/components/PhoneField";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import LeadForm from "@/components/checks/LeadForm";
+import ScoreResultView from "@/components/checks/ScoreResult";
 
 type Step = "upload" | "extracting" | "review" | "result" | "done";
 
@@ -16,6 +19,7 @@ export default function PropertyCheck() {
   const [error, setError] = useState<string | null>(null);
   const [ins, setIns] = useState<ExtractedInsurance | null>(null);
   const [form, setForm] = useState({ jmeno: "", email: "", telefon: "", predvolba: VYCHOZI_PREDVOLBA });
+  const [gdpr, setGdpr] = useState(false);
   const [sending, setSending] = useState(false);
   const [doneMsg, setDoneMsg] = useState<string>("");
   const [manual, setManual] = useState(false);
@@ -108,6 +112,7 @@ export default function PropertyCheck() {
     setError(null);
     if (form.jmeno.trim().length < 2) return setError("Vyplň prosím jméno.");
     if (!form.email && !form.telefon) return setError("Vyplň e-mail nebo telefon.");
+    if (!gdpr) return setError("Potvrď prosím souhlas se zpracováním údajů.");
     setSending(true);
     try {
       const payload: InsuranceLead = {
@@ -142,6 +147,7 @@ export default function PropertyCheck() {
     setFile(null);
     setIns(null);
     setForm({ jmeno: "", email: "", telefon: "", predvolba: VYCHOZI_PREDVOLBA });
+    setGdpr(false);
     setError(null);
     setManual(false);
   }
@@ -372,183 +378,38 @@ export default function PropertyCheck() {
           </>
         )}
 
-        {/* KROK 3 – výsledek + lead */}
+        {/* KROK 3 – zamčený teaser + lead form */}
         {step === "result" && result && ins && (
           <>
             <div className="savings">
-              <div className="label">🔒 Analýza pojištění je hotová</div>
+              <div className="label">🔒 Bodlíkovo finanční skóre je spočítané</div>
               <div className="amount" style={{ fontSize: 40 }}>•••</div>
               <div className="sub">
-                Vyplň formulář a hned uvidíš, jestli nejsi podpojištěný a o kolik bys přišel.
+                Vyplň formulář a hned uvidíš skóre, rizika i o kolik bys při škodě přišel.
               </div>
             </div>
 
-            <div className="mt" style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
-              <h3 style={{ marginTop: 0 }}>Chceš znát výsledek?</h3>
-              <p className="muted" style={{ marginTop: -6 }}>
-                Nech nám kontakt – výsledek uvidíš hned a poradce ti pojištění nezávazně projde.
-              </p>
-              <label className="field">
-                <span>Jméno a příjmení</span>
-                <input
-                  className="inp"
-                  value={form.jmeno}
-                  onChange={(e) => setForm({ ...form, jmeno: e.target.value })}
-                  placeholder="Jan Novák"
-                />
-              </label>
-              <div className="grid2">
-                <label className="field">
-                  <span>E-mail</span>
-                  <input
-                    className="inp"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="jan@email.cz"
-                  />
-                </label>
-                <PhoneField
-                  predvolba={form.predvolba}
-                  telefon={form.telefon}
-                  onPredvolbaChange={(v) => setForm({ ...form, predvolba: v })}
-                  onTelefonChange={(v) => setForm({ ...form, telefon: v })}
-                />
-              </div>
-
-              {error && <div className="err">{error}</div>}
-              <button className="btn btn-good mt" disabled={sending} onClick={handleSendLead}>
-                {sending ? "Odesílám…" : "Zobrazit výsledek →"}
-              </button>
-              <div className="center">
-                <button className="btn btn-ghost" onClick={() => setStep("review")}>
-                  ← Upravit údaje
-                </button>
-              </div>
-            </div>
+            <LeadForm
+              form={form}
+              setForm={setForm}
+              gdpr={gdpr}
+              setGdpr={setGdpr}
+              error={error}
+              sending={sending}
+              onSubmit={handleSendLead}
+              onBack={() => setStep("review")}
+              submitLabel="Zobrazit moje finanční skóre →"
+            />
           </>
         )}
 
-        {/* KROK 4 – odhalení výsledku */}
+        {/* KROK 4 – odhalení skóre + spící peníze + konzultace */}
         {step === "done" && result && ins && (
-          <>
-            <div className="cover">
-              <span className={"chip " + (result.maStavbu ? "on" : "off")}>
-                {result.maStavbu ? "✓" : "✗"} Stavba
-              </span>
-              <span className={"chip " + (result.maDomacnost ? "on" : "off")}>
-                {result.maDomacnost ? "✓" : "✗"} Domácnost
-              </span>
-            </div>
-
-            <div className="savings">
-              {result.maStavbu && result.podpojisteny && result.ztrataProKlienta && result.ztrataProKlienta > 0 ? (
-                <>
-                  <div className="label">⚠️ Jsi podpojištěný – při totální škodě bys přišel o</div>
-                  <div className={"amount" + (result.ztrataProKlienta > 1 ? " red" : "")}>
-                    {formatKc(result.ztrataProKlienta)}
-                  </div>
-                  <div className="sub">
-                    pojišťovna by ti vyplatila jen {result.plneniProTotalniSkodu != null
-                      ? formatKc(result.plneniProTotalniSkodu)
-                      : "—"}{" "}
-                    místo plné hodnoty
-                  </div>
-                  {krytiPct != null && (
-                    <div className="badge warn">
-                      Tvoje pojistná částka kryje jen {krytiPct} % hodnoty nemovitosti
-                    </div>
-                  )}
-                </>
-              ) : !result.maStavbu ? (
-                <>
-                  <div className="label">
-                    {isByt
-                      ? "Tvoje smlouva kryje domácnost, ne samotnou stavbu"
-                      : "⚠️ Tvoje smlouva nekryje stavbu"}
-                  </div>
-                  <div className="amount" style={{ fontSize: 34 }}>
-                    {result.maDomacnost ? "Jen domácnost" : "—"}
-                  </div>
-                  <div className="sub">
-                    {isByt
-                      ? "U bytu bývá stavba pojištěná přes SVJ – mrkni na doporučení níže."
-                      : "Riziko: opravu budovy bys při škodě platil ze svého. Viz doporučení níže."}
-                  </div>
-                </>
-              ) : result.soucasnaHodnota == null ? (
-                <>
-                  <div className="label">Kontrola pojištění stavby</div>
-                  <div className="amount" style={{ fontSize: 34 }}>—</div>
-                  <div className="sub">
-                    Pro výpočet doplň prosím obytnou plochu nemovitosti.
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="label">Pojištění stavby odpovídá hodnotě</div>
-                  <div className="amount">V pořádku ✅</div>
-                  <div className="sub">
-                    Pojistná částka kryje {krytiPct} % odhadované hodnoty – riziko krácení je nízké.
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="facts">
-              <div className="fact">
-                <div className="k">Odhad hodnoty stavby</div>
-                <div className="v">
-                  {result.soucasnaHodnota != null ? formatKc(result.soucasnaHodnota) : "—"}
-                </div>
-              </div>
-              <div className="fact">
-                <div className="k">Pojistná částka stavby</div>
-                <div className="v">
-                  {result.pojistnaCastka != null ? formatKc(result.pojistnaCastka) : "—"}
-                </div>
-              </div>
-              <div className="fact">
-                <div className="k">Krytí stavby</div>
-                <div className="v">{krytiPct != null ? `${krytiPct} %` : "—"}</div>
-              </div>
-              <div className="fact">
-                <div className="k">Plnění při totální škodě</div>
-                <div className="v">
-                  {result.plneniProTotalniSkodu != null
-                    ? formatKc(result.plneniProTotalniSkodu)
-                    : "—"}
-                </div>
-              </div>
-              <div className="fact">
-                <div className="k">Pojistná částka domácnosti</div>
-                <div className="v">
-                  {result.maDomacnost && result.domacnostCastka != null
-                    ? formatKc(result.domacnostCastka)
-                    : "Nepojištěno"}
-                </div>
-              </div>
-            </div>
-
-            {result.doporuceni.length > 0 && (
-              <div className="recos">
-                <div className="recos-title">💡 Doporučujeme doplnit</div>
-                {result.doporuceni.map((d, i) => (
-                  <div key={i} className="reco">
-                    {d}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="center mt" style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
-              <div className="success-icon">✅</div>
-              <p className="muted">{doneMsg}</p>
-              <button className="btn btn-primary mt" onClick={reset}>
-                Zkontrolovat další smlouvu
-              </button>
-            </div>
-          </>
+          <ScoreResultView
+            score={scoreProperty(ins, result)}
+            doneMsg={doneMsg}
+            onReset={reset}
+          />
         )}
       </div>
     </div>

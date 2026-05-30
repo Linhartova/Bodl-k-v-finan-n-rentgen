@@ -676,3 +676,319 @@ input.inp:focus {
     display: none;
   }
 }
+
+/* ============================================================ */
+/*  KONVERZNÍ UPGRADE – hero perks, důvěra, jak to funguje,     */
+/*  finanční skóre, spící peníze, konzultace, GDPR, mobil       */
+/* ============================================================ */
+
+/* Hero – odznáčky výhod */
+.hero-perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: center;
+  margin-top: 12px;
+  color: #dbeafe;
+  font-size: 13px;
+  font-weight: 600;
+}
+.hero-perks span {
+  white-space: nowrap;
+}
+
+/* Motivace pro vybraný produkt (nad kartou) */
+.product-motiv {
+  background: rgba(255, 255, 255, 0.08);
+  color: #eaf6fc;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+/* Důvěra – statistiky */
+.trust {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 22px;
+}
+.trust-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.2);
+}
+.trust-num {
+  font-family: var(--font-head);
+  font-size: 26px;
+  letter-spacing: 0.5px;
+  color: var(--brand-dark);
+  margin-bottom: 4px;
+}
+.trust-text {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* Jak to funguje */
+.how {
+  margin-top: 26px;
+  color: #fff;
+  text-align: center;
+}
+.how h2 {
+  font-family: var(--font-head);
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: 0.6px;
+  margin: 0 0 16px;
+}
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.how-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px 12px;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.2);
+  position: relative;
+}
+.how-num {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.how-ikona {
+  font-size: 30px;
+  margin-top: 6px;
+}
+.how-titulek {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+  margin-top: 6px;
+}
+.how-text {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* GDPR souhlas v lead formu */
+.gdpr {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 12px 0 4px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+  cursor: pointer;
+}
+.gdpr input {
+  margin-top: 2px;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  accent-color: var(--brand);
+}
+.gdpr a {
+  color: var(--brand-dark);
+  font-weight: 600;
+}
+
+/* ===== Výsledek: finanční skóre ===== */
+.result-view {
+  padding-top: 4px;
+}
+.score-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  padding: 6px 0 14px;
+}
+.score-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex: 0 0 auto;
+}
+.score-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 12;
+}
+.score-fill {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.6s ease;
+}
+.score-good .score-fill { stroke: var(--good); }
+.score-warn .score-fill { stroke: var(--warn); }
+.score-bad .score-fill { stroke: #dc2626; }
+.score-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.score-num strong {
+  font-family: var(--font-head);
+  font-size: 38px;
+  color: var(--ink);
+}
+.score-num span {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.score-title {
+  font-family: var(--font-head);
+  font-size: 22px;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+}
+.score-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.score-badge.score-good { background: var(--good-bg); color: var(--good); }
+.score-badge.score-warn { background: var(--warn-bg); color: var(--warn); }
+.score-badge.score-bad { background: #fef2f2; color: #dc2626; }
+
+/* Spící peníze – největší font na stránce výsledků */
+.sleeping {
+  text-align: center;
+  background: var(--brand-tint, #eaf6fc);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 16px;
+  margin: 6px 0 16px;
+}
+.sleeping-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+.sleeping-amount {
+  font-family: var(--font-head);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 1px;
+  color: #dc2626;
+  margin: 6px 0 4px;
+}
+.sleeping-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.sleeping-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.sleeping-grid .sg-k {
+  font-size: 12px;
+  color: var(--muted);
+}
+.sleeping-grid .sg-v {
+  font-family: var(--font-head);
+  font-size: 22px;
+  color: var(--brand-dark);
+}
+
+/* Rizika – seznam s barevnými tečkami */
+.risks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 14px;
+}
+.risk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+.risk-dot { flex: 0 0 auto; }
+.risk-good { background: var(--good-bg); color: #166534; border-color: #bbf7d0; }
+.risk-warn { background: var(--warn-bg); color: #92400e; border-color: #fde68a; }
+.risk-bad { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+
+/* Konzultace na konci výsledku */
+.consult {
+  text-align: center;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 4px;
+}
+.consult .btn { width: 100%; }
+
+/* ============================================================ */
+/*  MOBILNÍ UX                                                  */
+/* ============================================================ */
+@media (max-width: 600px) {
+  .wrap {
+    max-width: 480px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .how-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 12px;
+  }
+  .trust {
+    grid-template-columns: 1fr;
+  }
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+  /* Větší, palcově přívětivá tlačítka */
+  .btn {
+    padding: 15px 18px;
+    font-size: 17px;
+  }
+  .sleeping-amount {
+    font-size: 46px;
+  }
+  .score-block {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

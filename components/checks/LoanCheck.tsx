@@ -3,8 +3,11 @@
 import { useMemo, useRef, useState } from "react";
 import type { ExtractedLoan, SavingsResult, Lead } from "@/lib/types";
 import { calculateSavings, formatKc } from "@/lib/savings";
+import { scoreLoan } from "@/lib/score";
 import BodlikBadge from "@/components/BodlikBadge";
 import PhoneField, { formatPhone, VYCHOZI_PREDVOLBA } from "@/components/PhoneField";
+import LeadForm from "@/components/checks/LeadForm";
+import ScoreResultView from "@/components/checks/ScoreResult";
 
 type Step = "upload" | "extracting" | "review" | "result" | "done";
 
@@ -15,6 +18,7 @@ export default function LoanCheck() {
   const [error, setError] = useState<string | null>(null);
   const [loan, setLoan] = useState<ExtractedLoan | null>(null);
   const [form, setForm] = useState({ jmeno: "", email: "", telefon: "", predvolba: VYCHOZI_PREDVOLBA });
+  const [gdpr, setGdpr] = useState(false);
   const [sending, setSending] = useState(false);
   const [doneMsg, setDoneMsg] = useState<string>("");
   const [manual, setManual] = useState(false);
@@ -93,6 +97,7 @@ export default function LoanCheck() {
     setError(null);
     if (form.jmeno.trim().length < 2) return setError("Vyplň prosím jméno.");
     if (!form.email && !form.telefon) return setError("Vyplň e-mail nebo telefon.");
+    if (!gdpr) return setError("Potvrď prosím souhlas se zpracováním údajů.");
     setSending(true);
     try {
       const payload: Lead = {
@@ -127,6 +132,7 @@ export default function LoanCheck() {
     setFile(null);
     setLoan(null);
     setForm({ jmeno: "", email: "", telefon: "", predvolba: VYCHOZI_PREDVOLBA });
+    setGdpr(false);
     setError(null);
     setManual(false);
   }
@@ -300,110 +306,36 @@ export default function LoanCheck() {
           </>
         )}
 
-        {/* KROK 3 – výsledek + lead */}
+        {/* KROK 3 – zamčený teaser + lead form */}
         {step === "result" && savings && loan && (
           <>
             <div className="savings">
-              <div className="label">🔒 Tvoje úspora je spočítaná</div>
+              <div className="label">🔒 Bodlíkovo finanční skóre je spočítané</div>
               <div className="amount" style={{ fontSize: 40 }}>•••</div>
-              <div className="sub">Vyplň formulář a hned ti ji odhalíme.</div>
+              <div className="sub">Vyplň formulář a hned ti odhalíme skóre i spící peníze.</div>
             </div>
 
-            <div className="mt" style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
-              <h3 style={{ marginTop: 0 }}>Chceš znát svoji úsporu?</h3>
-              <p className="muted" style={{ marginTop: -6 }}>
-                Nech nám kontakt – výsledek uvidíš hned a poradce ti ho nezávazně ověří.
-              </p>
-              <label className="field">
-                <span>Jméno a příjmení</span>
-                <input
-                  className="inp"
-                  value={form.jmeno}
-                  onChange={(e) => setForm({ ...form, jmeno: e.target.value })}
-                  placeholder="Jan Novák"
-                />
-              </label>
-              <div className="grid2">
-                <label className="field">
-                  <span>E-mail</span>
-                  <input
-                    className="inp"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="jan@email.cz"
-                  />
-                </label>
-                <PhoneField
-                  predvolba={form.predvolba}
-                  telefon={form.telefon}
-                  onPredvolbaChange={(v) => setForm({ ...form, predvolba: v })}
-                  onTelefonChange={(v) => setForm({ ...form, telefon: v })}
-                />
-              </div>
-
-              {error && <div className="err">{error}</div>}
-              <button className="btn btn-good mt" disabled={sending} onClick={handleSendLead}>
-                {sending ? "Odesílám…" : "Zobrazit moji úsporu →"}
-              </button>
-              <div className="center">
-                <button className="btn btn-ghost" onClick={() => setStep("review")}>
-                  ← Upravit údaje
-                </button>
-              </div>
-            </div>
+            <LeadForm
+              form={form}
+              setForm={setForm}
+              gdpr={gdpr}
+              setGdpr={setGdpr}
+              error={error}
+              sending={sending}
+              onSubmit={handleSendLead}
+              onBack={() => setStep("review")}
+              submitLabel="Zobrazit moje finanční skóre →"
+            />
           </>
         )}
 
-        {/* KROK 4 – odhalení úspory */}
+        {/* KROK 4 – odhalení skóre + spící peníze + konzultace */}
         {step === "done" && savings && loan && (
-          <>
-            <div className="savings">
-              <div className="label">U tebe vidíme potenciál úspory</div>
-              <div className={"amount" + (savings.rocniUspora > 1 ? " red" : "")}>
-                {savings.rocniUspora > 0 ? `cca ${formatKc(savings.rocniUspora)}` : "—"}
-              </div>
-              <div className="sub">
-                {savings.rocniUspora > 0
-                  ? `ročně oproti tržní sazbě ${savings.trzniSazba} %`
-                  : "Tvoje sazba je už blízko trhu. Kontrola se přesto vyplatí."}
-              </div>
-              {savings.urgentni && savings.mesicuDoFixace !== null && (
-                <div className="badge warn">
-                  ⏰ Fixace končí za {savings.mesicuDoFixace} měs. – ideální čas jednat
-                </div>
-              )}
-            </div>
-
-            <div className="facts">
-              <div className="fact">
-                <div className="k">Tvoje sazba</div>
-                <div className="v">{loan.sazba != null ? `${loan.sazba} %` : "—"}</div>
-              </div>
-              <div className="fact">
-                <div className="k">Tržní sazba</div>
-                <div className="v">{savings.trzniSazba} %</div>
-              </div>
-              <div className="fact">
-                <div className="k">Přeplácíš o</div>
-                <div className="v">{savings.rozdilSazby} %</div>
-              </div>
-              <div className="fact">
-                <div className="k">Úspora do konce fixace</div>
-                <div className="v">
-                  {savings.usporaDoFixace != null ? formatKc(savings.usporaDoFixace) : "—"}
-                </div>
-              </div>
-            </div>
-
-            <div className="center mt" style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
-              <div className="success-icon">✅</div>
-              <p className="muted">{doneMsg}</p>
-              <button className="btn btn-primary mt" onClick={reset}>
-                Zkontrolovat další smlouvu
-              </button>
-            </div>
-          </>
+          <ScoreResultView
+            score={scoreLoan(loan, savings)}
+            doneMsg={doneMsg}
+            onReset={reset}
+          />
         )}
       </div>
     </div>

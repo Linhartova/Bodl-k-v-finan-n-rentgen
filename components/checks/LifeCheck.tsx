@@ -3,8 +3,11 @@
 import { useMemo, useRef, useState } from "react";
 import type { ExtractedLife, LifeResult, LifeLead } from "@/lib/zivot/types";
 import { analyzeLife, formatKc } from "@/lib/zivot/calc";
+import { scoreLife } from "@/lib/score";
 import BodlikBadge from "@/components/BodlikBadge";
-import PhoneField, { formatPhone, VYCHOZI_PREDVOLBA } from "@/components/PhoneField";
+import { formatPhone, VYCHOZI_PREDVOLBA } from "@/components/PhoneField";
+import LeadForm from "@/components/checks/LeadForm";
+import ScoreResultView from "@/components/checks/ScoreResult";
 
 type Step = "upload" | "extracting" | "review" | "result" | "done";
 
@@ -77,6 +80,7 @@ export default function LifeCheck() {
   const [error, setError] = useState<string | null>(null);
   const [life, setLife] = useState<ExtractedLife | null>(null);
   const [form, setForm] = useState({ jmeno: "", email: "", telefon: "", predvolba: VYCHOZI_PREDVOLBA });
+  const [gdpr, setGdpr] = useState(false);
   const [sending, setSending] = useState(false);
   const [doneMsg, setDoneMsg] = useState<string>("");
   const [manual, setManual] = useState(false);
@@ -147,6 +151,7 @@ export default function LifeCheck() {
     setError(null);
     if (form.jmeno.trim().length < 2) return setError("Vyplň prosím jméno.");
     if (!form.email && !form.telefon) return setError("Vyplň e-mail nebo telefon.");
+    if (!gdpr) return setError("Potvrď prosím souhlas se zpracováním údajů.");
     setSending(true);
     try {
       const payload: LifeLead = {
@@ -181,6 +186,7 @@ export default function LifeCheck() {
     setFile(null);
     setLife(null);
     setForm({ jmeno: "", email: "", telefon: "", predvolba: VYCHOZI_PREDVOLBA });
+    setGdpr(false);
     setError(null);
     setManual(false);
   }
@@ -433,144 +439,38 @@ export default function LifeCheck() {
           </>
         )}
 
-        {/* KROK 3 – výsledek + lead */}
+        {/* KROK 3 – zamčený teaser + lead form */}
         {step === "result" && result && life && (
           <>
             <div className="savings">
-              <div className="label">🔒 Analýza životního pojištění je hotová</div>
+              <div className="label">🔒 Bodlíkovo finanční skóre je spočítané</div>
               <div className="amount" style={{ fontSize: 40 }}>•••</div>
               <div className="sub">
-                Vyplň formulář a hned uvidíš, kde máš mezeru v krytí a kolik můžeš ušetřit.
+                Vyplň formulář a hned uvidíš skóre, mezery v krytí i možnou úsporu.
               </div>
             </div>
 
-            <div className="mt" style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
-              <h3 style={{ marginTop: 0 }}>Chceš znát výsledek?</h3>
-              <p className="muted" style={{ marginTop: -6 }}>
-                Nech nám kontakt – výsledek uvidíš hned a poradce ti pojištění nezávazně projde.
-              </p>
-              <label className="field">
-                <span>Jméno a příjmení</span>
-                <input
-                  className="inp"
-                  value={form.jmeno}
-                  onChange={(e) => setForm({ ...form, jmeno: e.target.value })}
-                  placeholder="Jan Novák"
-                />
-              </label>
-              <div className="grid2">
-                <label className="field">
-                  <span>E-mail</span>
-                  <input
-                    className="inp"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="jan@email.cz"
-                  />
-                </label>
-                <PhoneField
-                  predvolba={form.predvolba}
-                  telefon={form.telefon}
-                  onPredvolbaChange={(v) => setForm({ ...form, predvolba: v })}
-                  onTelefonChange={(v) => setForm({ ...form, telefon: v })}
-                />
-              </div>
-
-              {error && <div className="err">{error}</div>}
-              <button className="btn btn-good mt" disabled={sending} onClick={handleSendLead}>
-                {sending ? "Odesílám…" : "Zobrazit výsledek →"}
-              </button>
-              <div className="center">
-                <button className="btn btn-ghost" onClick={() => setStep("review")}>
-                  ← Upravit údaje
-                </button>
-              </div>
-            </div>
+            <LeadForm
+              form={form}
+              setForm={setForm}
+              gdpr={gdpr}
+              setGdpr={setGdpr}
+              error={error}
+              sending={sending}
+              onSubmit={handleSendLead}
+              onBack={() => setStep("review")}
+              submitLabel="Zobrazit moje finanční skóre →"
+            />
           </>
         )}
 
-        {/* KROK 4 – odhalení výsledku */}
+        {/* KROK 4 – odhalení skóre + spící peníze + konzultace */}
         {step === "done" && result && life && (
-          <>
-            <div className="savings">
-              {result.celkovaMezera > 0 ? (
-                <>
-                  <div className="label">⚠️ V krytí klíčových rizik ti chybí</div>
-                  <div className={"amount" + (result.celkovaMezera > 1 ? " red" : "")}>
-                    {formatKc(result.celkovaMezera)}
-                  </div>
-                  <div className="sub">
-                    {result.chybiInvalidita
-                      ? "nemáš sjednanou invaliditu 3. stupně – nejvážnější opomíjené riziko"
-                      : "tvé krytí je nižší než doporučení pro tvoji situaci"}
-                  </div>
-                  {result.jeInvesticni && result.odhadUsporaPojistne ? (
-                    <div className="badge warn">
-                      💸 Navíc přeplácíš ~{formatKc(result.odhadUsporaPojistne)} ročně za investiční složku
-                    </div>
-                  ) : null}
-                </>
-              ) : result.jeInvesticni && result.odhadUsporaPojistne ? (
-                <>
-                  <div className="label">Můžeš ušetřit na pojistném</div>
-                  <div className={"amount" + (result.odhadUsporaPojistne > 1 ? " red" : "")}>
-                    ~{formatKc(result.odhadUsporaPojistne)}
-                  </div>
-                  <div className="sub">
-                    ročně přechodem z investičního na čistě rizikové pojištění – krytí zůstane stejné
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="label">Tvoje životní pojištění</div>
-                  <div className="amount">V pořádku ✅</div>
-                  <div className="sub">
-                    Krytí klíčových rizik odpovídá doporučení a neplatíš zbytečně navíc.
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="facts">
-              <div className="fact">
-                <div className="k">Smrt (jakákoliv příčina)</div>
-                <div className="v">
-                  {life.smrtJakakolivPricina != null ? formatKc(life.smrtJakakolivPricina) : "—"}
-                </div>
-              </div>
-              <div className="fact">
-                <div className="k">Doporučeno smrt</div>
-                <div className="v">{formatKc(result.doporucenaSmrt)}</div>
-              </div>
-              <div className="fact">
-                <div className="k">Invalidita 3. stupně</div>
-                <div className="v">
-                  {life.invalidita3 != null ? formatKc(life.invalidita3) : "chybí"}
-                </div>
-              </div>
-              <div className="fact">
-                <div className="k">Doporučeno invalidita</div>
-                <div className="v">{formatKc(result.doporucenaInvalidita)}</div>
-              </div>
-            </div>
-
-            {result.predpoklady.length > 0 && (
-              <div className="muted" style={{ fontSize: 13, marginTop: 12, lineHeight: 1.5 }}>
-                {result.predpoklady.map((p, i) => (
-                  <div key={i}>• {p}</div>
-                ))}
-              </div>
-            )}
-
-            <div className="center mt" style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
-              <div className="success-icon">✅</div>
-              <p className="muted">{doneMsg}</p>
-              <button className="btn btn-primary mt" onClick={reset}>
-                Zkontrolovat další smlouvu
-              </button>
-            </div>
-          </>
+          <ScoreResultView
+            score={scoreLife(life, result)}
+            doneMsg={doneMsg}
+            onReset={reset}
+          />
         )}
       </div>
     </div>
