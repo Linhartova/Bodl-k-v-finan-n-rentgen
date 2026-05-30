@@ -592,51 +592,87 @@ input.inp:focus {
 }
 /* Menší maskot + bublina, ať hlavička nezabírá moc výšky */
 .rentgen .bodlik-badge {
-  margin-top: 4px;
+  margin-top: 2px;
 }
 .rentgen .bodlik-img {
-  height: 56px;
+  height: 46px;
 }
 .rentgen .bodlik-slogan {
-  font-size: 13px;
-  padding: 5px 9px;
-  margin-bottom: 14px;
+  font-size: 12px;
+  padding: 4px 8px;
+  margin-bottom: 10px;
 }
 .rentgen .bodlik-slogan::after {
-  bottom: 12px;
+  bottom: 10px;
 }
-/* Taby těsněji */
+/* Taby těsněji – a drž je vedle sebe i na užších oknech */
 .rentgen .rentgen-tabs {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  gap: 8px;
 }
 .rentgen .rentgen-tab {
-  padding: 9px 8px;
+  padding: 8px 6px;
   gap: 2px;
+}
+.rentgen .rentgen-tab-emoji {
+  font-size: 22px;
+}
+.rentgen .rentgen-tab-label {
+  font-size: 13px;
+}
+.rentgen .rentgen-tab-desc {
+  font-size: 11px;
 }
 /* Vnořená karta kalkulačky – menší padding a mezery */
 .rentgen .embedded .card {
-  padding: 14px 20px;
+  padding: 12px 18px;
 }
 .rentgen .embedded .steps {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .rentgen .embedded .drop {
-  padding: 16px 16px;
+  padding: 14px 16px;
 }
 .rentgen .embedded .drop .icon {
-  font-size: 26px;
+  font-size: 24px;
+}
+.rentgen .embedded .drop h3 {
+  margin: 6px 0 3px;
 }
 .rentgen .embedded .mt {
   margin-top: 8px;
 }
 .rentgen .embedded .or {
-  margin: 6px 0;
+  margin: 5px 0;
 }
 .rentgen .embedded .legal {
-  margin-top: 6px;
+  margin-top: 5px;
 }
-/* Patička blíž k obsahu */
+/* Patička blíž k obsahu a kompaktní */
 .rentgen .site-footer {
-  margin-top: 16px;
-  padding-top: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
+}
+.rentgen .site-footer .footer-logo {
+  display: none;
+}
+.rentgen .site-footer .footer-links {
+  margin-bottom: 6px;
+}
+
+/* Na užších oknech udrž taby ve třech sloupcích (nepřepínat na řádky),
+   jen text trochu zmenši – vertikálně to ušetří hodně místa. */
+@media (max-width: 560px) {
+  .rentgen .rentgen-tabs {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .rentgen .rentgen-tab {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 2px;
+  }
+  .rentgen .rentgen-tab-desc {
+    display: none;
+  }
 }
