@@ -570,3 +570,73 @@ input.inp:focus {
   font-size: 12px;
   color: #64748b;
 }
+
+/* ===== Bodlíkův rentgen – kompaktní režim (vše na jednu obrazovku) ===== */
+.rentgen {
+  padding-top: 12px;
+  padding-bottom: 14px;
+}
+.rentgen .hero {
+  margin-bottom: 8px;
+}
+.rentgen .brand-logo {
+  height: 22px;
+  margin-bottom: 4px;
+}
+.rentgen .hero h1 {
+  font-size: 28px;
+  margin-bottom: 2px;
+}
+.rentgen .hero p {
+  font-size: 13px;
+}
+/* Menší maskot + bublina, ať hlavička nezabírá moc výšky */
+.rentgen .bodlik-badge {
+  margin-top: 4px;
+}
+.rentgen .bodlik-img {
+  height: 56px;
+}
+.rentgen .bodlik-slogan {
+  font-size: 13px;
+  padding: 5px 9px;
+  margin-bottom: 14px;
+}
+.rentgen .bodlik-slogan::after {
+  bottom: 12px;
+}
+/* Taby těsněji */
+.rentgen .rentgen-tabs {
+  margin-bottom: 12px;
+}
+.rentgen .rentgen-tab {
+  padding: 9px 8px;
+  gap: 2px;
+}
+/* Vnořená karta kalkulačky – menší padding a mezery */
+.rentgen .embedded .card {
+  padding: 14px 20px;
+}
+.rentgen .embedded .steps {
+  margin-bottom: 10px;
+}
+.rentgen .embedded .drop {
+  padding: 16px 16px;
+}
+.rentgen .embedded .drop .icon {
+  font-size: 26px;
+}
+.rentgen .embedded .mt {
+  margin-top: 8px;
+}
+.rentgen .embedded .or {
+  margin: 6px 0;
+}
+.rentgen .embedded .legal {
+  margin-top: 6px;
+}
+/* Patička blíž k obsahu */
+.rentgen .site-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+}

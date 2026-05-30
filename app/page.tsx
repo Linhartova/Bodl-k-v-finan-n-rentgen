@@ -18,7 +18,7 @@ export default function BodlikuvRentgen() {
   const [tab, setTab] = useState<Tab>("uver");
 
   return (
-    <div className="wrap">
+    <div className="wrap rentgen">
       <div className="hero">
         <img className="brand-logo" src="/sjednej-logo-white.png" alt="Sjednej.cz" />
         <h1>Bodlíkův rentgen</h1>
