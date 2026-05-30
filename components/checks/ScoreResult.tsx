@@ -110,7 +110,12 @@ export default function ScoreResultView({
         <p className="muted" style={{ marginTop: 0 }}>
           {doneMsg}
         </p>
-        <a className="btn btn-good" href="tel:+420800100100">
+        <a
+          className="btn btn-good"
+          href="https://www.sjednej.cz/kontakt"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Chci bezplatnou konzultaci
         </a>
         <a
