@@ -12,6 +12,22 @@ import ScoreResultView from "@/components/checks/ScoreResult";
 
 type Step = "upload" | "extracting" | "review" | "result" | "done";
 
+// Pojišťovny nabízející pojištění nemovitosti / domácnosti v ČR.
+const POJISTOVNY_MAJETEK = [
+  "Allianz",
+  "Česká podnikatelská pojišťovna (ČPP)",
+  "ČSOB Pojišťovna",
+  "Generali Česká pojišťovna",
+  "Kooperativa",
+  "Direct pojišťovna",
+  "UNIQA",
+  "Slavia pojišťovna",
+  "Hasičská vzájemná pojišťovna",
+  "Pillow pojišťovna",
+  "MAXIMA pojišťovna",
+  "Jiná pojišťovna",
+];
+
 export default function PropertyCheck() {
   const [step, setStep] = useState<Step>("upload");
   const [file, setFile] = useState<File | null>(null);
@@ -250,11 +266,26 @@ export default function PropertyCheck() {
                 </label>
                 <label className="field">
                   <span>Pojišťovna</span>
-                  <input
-                    className="inp"
-                    value={ins.pojistovna ?? ""}
-                    onChange={(e) => updateIns("pojistovna", e.target.value)}
-                  />
+                  {manual ? (
+                    <select
+                      className="inp"
+                      value={ins.pojistovna ?? ""}
+                      onChange={(e) => updateIns("pojistovna", e.target.value)}
+                    >
+                      <option value="">— vyber pojišťovnu —</option>
+                      {POJISTOVNY_MAJETEK.map((p) => (
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      className="inp"
+                      value={ins.pojistovna ?? ""}
+                      onChange={(e) => updateIns("pojistovna", e.target.value)}
+                    />
+                  )}
                 </label>
               </div>
               <label className="field">

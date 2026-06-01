@@ -37,6 +37,24 @@ const BOOL_KEYS: (keyof ExtractedLife)[] = [
   "pripojisteniDeti",
 ];
 
+// Pojišťovny nabízející životní pojištění v ČR.
+const POJISTOVNY_ZIVOT = [
+  "Allianz",
+  "AXA / UNIQA",
+  "Česká podnikatelská pojišťovna (ČPP)",
+  "ČSOB Pojišťovna",
+  "Generali Česká pojišťovna",
+  "Komerční pojišťovna",
+  "Kooperativa",
+  "MetLife",
+  "NN Životní pojišťovna",
+  "Pojišťovna České spořitelny",
+  "UNIQA",
+  "Simplea",
+  "Youplus",
+  "Jiná pojišťovna",
+];
+
 const EMPTY: ExtractedLife = {
   mesicniPojistne: null,
   pojistovna: null,
@@ -205,6 +223,27 @@ export default function LifeCheck() {
       />
     </label>
   );
+  // Výběr pojišťovny: ruční režim = rolovátko, OCR = volný text.
+  const pojistovnaField = () =>
+    manual ? (
+      <label className="field">
+        <span>Pojišťovna</span>
+        <select
+          className="inp"
+          value={life?.pojistovna ?? ""}
+          onChange={(e) => updateLife("pojistovna", e.target.value)}
+        >
+          <option value="">— vyber pojišťovnu —</option>
+          {POJISTOVNY_ZIVOT.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </label>
+    ) : (
+      txt("pojistovna", "Pojišťovna")
+    );
   const number = (key: keyof ExtractedLife, label: string, placeholder?: string) => (
     <label className="field">
       <span>{label}</span>
@@ -332,7 +371,7 @@ export default function LifeCheck() {
             <div className="mt">
               {sekce("Smlouva")}
               <div className="grid2">
-                {txt("pojistovna", "Pojišťovna")}
+                {pojistovnaField()}
                 {txt("nazevProduktu", "Název produktu")}
               </div>
               <div className="grid2">
