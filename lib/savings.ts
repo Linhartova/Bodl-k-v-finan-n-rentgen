@@ -8,7 +8,7 @@ import type { ExtractedLoan, SavingsResult } from "./types";
 // Obě lze přepsat přes env (MARKET_RATE_HYPO / MARKET_RATE_SPOTREBITELSKY);
 // kvůli zpětné kompatibilitě platí starší MARKET_RATE jako fallback pro hypotéku.
 const DEFAULT_HYPO = 4.9;
-const DEFAULT_SPOTREBITELSKY = 8.9;
+const DEFAULT_SPOTREBITELSKY = 4.9;
 
 // Pokud ze smlouvy nezjistíme zbývající splatnost, použijeme tento odhad (měsíce).
 const FALLBACK_SPLATNOST_MESICU = 240; // 20 let
