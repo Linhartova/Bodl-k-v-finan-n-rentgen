@@ -11,6 +11,54 @@ import ScoreResultView from "@/components/checks/ScoreResult";
 
 type Step = "upload" | "extracting" | "review" | "result" | "done";
 
+// Banky nabízející hypotéky v ČR.
+const HYPO_BANKY = [
+  "Česká spořitelna",
+  "ČSOB / Hypoteční banka",
+  "Komerční banka",
+  "Raiffeisenbank",
+  "UniCredit Bank",
+  "MONETA Money Bank",
+  "mBank",
+  "Fio banka",
+  "Banka Creditas",
+  "Oberbank",
+  "Modrá pyramida",
+  "Stavební spořitelna ČS (Buřinka)",
+  "Jiná banka",
+];
+
+// Banky nabízející spotřebitelské úvěry v ČR.
+const SPOTREBITELSKE_BANKY = [
+  "Česká spořitelna",
+  "ČSOB",
+  "Komerční banka",
+  "MONETA Money Bank",
+  "Raiffeisenbank",
+  "UniCredit Bank",
+  "Air Bank",
+  "Fio banka",
+  "mBank",
+  "Banka Creditas",
+  "Trinity Bank",
+  "Jiná banka",
+];
+
+// Nebankovní poskytovatelé spotřebitelských úvěrů.
+const NEBANKOVNI = [
+  "Home Credit",
+  "Cofidis",
+  "Provident Financial",
+  "Zonky",
+  "Essox",
+  "Fair Credit",
+  "COOL Credit",
+  "Ferratum",
+  "ČSOB Leasing",
+  "MONETA Leasing",
+  "Jiný poskytovatel",
+];
+
 export default function LoanCheck() {
   const [step, setStep] = useState<Step>("upload");
   const [file, setFile] = useState<File | null>(null);
@@ -22,6 +70,8 @@ export default function LoanCheck() {
   const [sending, setSending] = useState(false);
   const [doneMsg, setDoneMsg] = useState<string>("");
   const [manual, setManual] = useState(false);
+  // Pro spotřebitelský úvěr v ručním režimu: bankovní vs. nebankovní instituce.
+  const [uverTyp, setUverTyp] = useState<"bankovni" | "nebankovni">("bankovni");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const savings: SavingsResult | null = useMemo(
@@ -135,6 +185,7 @@ export default function LoanCheck() {
     setGdpr(false);
     setError(null);
     setManual(false);
+    setUverTyp("bankovni");
   }
 
   const stepIndex = { upload: 0, extracting: 0, review: 1, result: 2, done: 3 }[step];
@@ -230,7 +281,10 @@ export default function LoanCheck() {
                     <select
                       className="inp"
                       value={loan.produkt ?? ""}
-                      onChange={(e) => updateLoan("produkt", e.target.value)}
+                      onChange={(e) => {
+                        updateLoan("produkt", e.target.value);
+                        updateLoan("poskytovatel", ""); // přepnutí produktu vynuluje výběr instituce
+                      }}
                     >
                       <option value="Spotřebitelský úvěr">Spotřebitelský úvěr</option>
                       <option value="Hypotéka">Hypotéka</option>
@@ -243,14 +297,64 @@ export default function LoanCheck() {
                     />
                   )}
                 </label>
-                <label className="field">
-                  <span>Poskytovatel</span>
-                  <input
-                    className="inp"
-                    value={loan.poskytovatel ?? ""}
-                    onChange={(e) => updateLoan("poskytovatel", e.target.value)}
-                  />
-                </label>
+
+                {/* Instituce: ruční režim = rozcestník/rolovátko, OCR = volný text */}
+                {!manual ? (
+                  <label className="field">
+                    <span>Instituce</span>
+                    <input
+                      className="inp"
+                      value={loan.poskytovatel ?? ""}
+                      onChange={(e) => updateLoan("poskytovatel", e.target.value)}
+                    />
+                  </label>
+                ) : loan.produkt === "Hypotéka" ? (
+                  <label className="field">
+                    <span>Banka</span>
+                    <select
+                      className="inp"
+                      value={loan.poskytovatel ?? ""}
+                      onChange={(e) => updateLoan("poskytovatel", e.target.value)}
+                    >
+                      <option value="">— vyber banku —</option>
+                      {HYPO_BANKY.map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : (
+                  <label className="field">
+                    <span>Instituce</span>
+                    <select
+                      className="inp"
+                      style={{ marginBottom: 8 }}
+                      value={uverTyp}
+                      onChange={(e) => {
+                        setUverTyp(e.target.value as "bankovni" | "nebankovni");
+                        updateLoan("poskytovatel", ""); // přepnutí typu vynuluje výběr
+                      }}
+                    >
+                      <option value="bankovni">Bankovní</option>
+                      <option value="nebankovni">Nebankovní</option>
+                    </select>
+                    <select
+                      className="inp"
+                      value={loan.poskytovatel ?? ""}
+                      onChange={(e) => updateLoan("poskytovatel", e.target.value)}
+                    >
+                      <option value="">
+                        {uverTyp === "bankovni" ? "— vyber banku —" : "— vyber poskytovatele —"}
+                      </option>
+                      {(uverTyp === "bankovni" ? SPOTREBITELSKE_BANKY : NEBANKOVNI).map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
               </div>
               <div className="grid2">
                 <label className="field">
