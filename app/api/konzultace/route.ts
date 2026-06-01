@@ -27,6 +27,13 @@ const PRODUKT_NAZEV: Record<string, string> = {
   zivot: "životní pojištění",
 };
 
+// Pipeline v Pipedrive podle produktu: půjčky→2, majetek→7, životní→8.
+const PRODUKT_PIPELINE: Record<string, number> = {
+  uver: 2,
+  nemovitost: 7,
+  zivot: 8,
+};
+
 async function saveLocally(d: KonzultaceReq) {
   const dir = path.join(process.cwd(), "data");
   const file = path.join(dir, "konzultace.json");
@@ -74,10 +81,13 @@ async function sendToPipedrive(d: KonzultaceReq): Promise<{ leadId: string }> {
   const personId = personJson.data.id;
 
   const titulek = `Konzultace zdarma – ${d.jmeno} (${PRODUKT_NAZEV[d.produkt] ?? d.produkt})`;
+  const dealBody: any = { title: titulek, person_id: personId };
+  const pipelineId = PRODUKT_PIPELINE[d.produkt];
+  if (pipelineId) dealBody.pipeline_id = pipelineId;
   const dealRes = await fetch(`${base}/deals?${q}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title: titulek, person_id: personId }),
+    body: JSON.stringify(dealBody),
   });
   const dealJson = await dealRes.json();
   if (!dealRes.ok || !dealJson?.data?.id) {

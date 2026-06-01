@@ -81,7 +81,7 @@ async function sendToPipedrive(lead: InsuranceLead): Promise<{ leadId: string }>
   const titulek = lead.result.podpojisteny && ztrata
     ? `Kontrola pojištění – ${lead.jmeno} (podpojištěn, ztráta ${formatKc(ztrata)})`
     : `Kontrola pojištění – ${lead.jmeno}`;
-  const dealBody: any = { title: titulek, person_id: personId };
+  const dealBody: any = { title: titulek, person_id: personId, pipeline_id: 7 };
   if (ztrata && ztrata > 0) {
     dealBody.value = ztrata;
     dealBody.currency = "CZK";

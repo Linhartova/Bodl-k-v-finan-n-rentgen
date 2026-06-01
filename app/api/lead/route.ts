@@ -70,7 +70,7 @@ async function sendToPipedrive(lead: Lead): Promise<{ leadId: string }> {
 
   // 2) Deal (obchod)
   const titulek = `Kontrola úvěru – ${lead.jmeno} (úspora ${formatKc(lead.savings.rocniUspora)}/rok)`;
-  const dealBody: any = { title: titulek, person_id: personId };
+  const dealBody: any = { title: titulek, person_id: personId, pipeline_id: 2 };
   if (lead.savings.rocniUspora > 0) {
     dealBody.value = lead.savings.rocniUspora;
     dealBody.currency = "CZK";

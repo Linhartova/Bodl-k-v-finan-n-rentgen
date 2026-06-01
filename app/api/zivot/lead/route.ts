@@ -107,7 +107,7 @@ async function sendToPipedrive(lead: LifeLead): Promise<{ leadId: string }> {
   const titulek = mezera > 0
     ? `Kontrola životního pojištění – ${lead.jmeno} (mezera v krytí ${formatKc(mezera)})`
     : `Kontrola životního pojištění – ${lead.jmeno}`;
-  const dealBody: any = { title: titulek, person_id: personId };
+  const dealBody: any = { title: titulek, person_id: personId, pipeline_id: 8 };
   if (mezera > 0) {
     dealBody.value = mezera;
     dealBody.currency = "CZK";

@@ -6,7 +6,10 @@
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\mlinh\\\\Builders day\\\\uver-kontrola\" -Recurse -File | Where-Object { $_.FullName -notmatch 'node_modules|\\\\.next|\\\\.git' } | Select-Object -ExpandProperty FullName)",
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\mlinh\" -Directory -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '^\\(AppData|Application Data|Cookies|Local Settings|NetHood|PrintHood|Recent|SendTo|Templates|Start Menu|Searches|Saved Games|Links|Favorites|Contacts|3D Objects|ansel\\)$' } | Select-Object Name | Format-Table -AutoSize)",
       "Bash(py --version)",
-      "Bash(where python *)"
+      "Bash(where python *)",
+      "Bash(git -C \"C:/Users/mlinh/Documents/crm-sjednej\" init)",
+      "Bash(git -C \"C:/Users/mlinh/Documents/crm-sjednej\" add -A)",
+      "Bash(git -C \"C:/Users/mlinh/Documents/crm-sjednej\" status --short)"
     ]
   }
 }
