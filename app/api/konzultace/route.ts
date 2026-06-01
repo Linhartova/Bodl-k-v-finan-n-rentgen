@@ -74,28 +74,28 @@ async function sendToPipedrive(d: KonzultaceReq): Promise<{ leadId: string }> {
   const personId = personJson.data.id;
 
   const titulek = `Konzultace zdarma – ${d.jmeno} (${PRODUKT_NAZEV[d.produkt] ?? d.produkt})`;
-  const leadRes = await fetch(`${base}/leads?${q}`, {
+  const dealRes = await fetch(`${base}/deals?${q}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title: titulek, person_id: personId }),
   });
-  const leadJson = await leadRes.json();
-  if (!leadRes.ok || !leadJson?.data?.id) {
-    throw new Error(`Pipedrive lead: ${leadJson?.error || leadRes.status}`);
+  const dealJson = await dealRes.json();
+  if (!dealRes.ok || !dealJson?.data?.id) {
+    throw new Error(`Pipedrive deal: ${dealJson?.error || dealRes.status}`);
   }
-  const leadId = leadJson.data.id as string;
+  const dealId = dealJson.data.id as string;
 
   try {
     await fetch(`${base}/notes?${q}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lead_id: leadId, content: popis(d).replace(/\n/g, "<br>") }),
+      body: JSON.stringify({ deal_id: dealId, content: popis(d).replace(/\n/g, "<br>") }),
     });
   } catch {
     /* ignore */
   }
 
-  return { leadId };
+  return { leadId: dealId };
 }
 
 export async function POST(req: NextRequest) {

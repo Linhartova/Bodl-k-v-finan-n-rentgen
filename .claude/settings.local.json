@@ -4,7 +4,9 @@
       "PowerShell($nodeDir = \"C:\\\\Users\\\\mlinh\\\\AppData\\\\Local\\\\Microsoft\\\\WinGet\\\\Packages\\\\OpenJS.NodeJS.LTS_Microsoft.Winget.Source_8wekyb3d8bbwe\\\\node-v24.16.0-win-x64\"; $env:Path = \"$nodeDir;$env:Path\"; npm run dev)",
       "mcp__Claude_Preview__preview_start",
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\mlinh\\\\Builders day\\\\uver-kontrola\" -Recurse -File | Where-Object { $_.FullName -notmatch 'node_modules|\\\\.next|\\\\.git' } | Select-Object -ExpandProperty FullName)",
-      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\mlinh\" -Directory -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '^\\(AppData|Application Data|Cookies|Local Settings|NetHood|PrintHood|Recent|SendTo|Templates|Start Menu|Searches|Saved Games|Links|Favorites|Contacts|3D Objects|ansel\\)$' } | Select-Object Name | Format-Table -AutoSize)"
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\mlinh\" -Directory -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '^\\(AppData|Application Data|Cookies|Local Settings|NetHood|PrintHood|Recent|SendTo|Templates|Start Menu|Searches|Saved Games|Links|Favorites|Contacts|3D Objects|ansel\\)$' } | Select-Object Name | Format-Table -AutoSize)",
+      "Bash(py --version)",
+      "Bash(where python *)"
     ]
   }
 }

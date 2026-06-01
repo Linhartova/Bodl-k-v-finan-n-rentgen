@@ -102,38 +102,39 @@ async function sendToPipedrive(lead: LifeLead): Promise<{ leadId: string }> {
   }
   const personId = personJson.data.id;
 
-  // 2) Lead
+  // 2) Deal (obchod)
   const mezera = lead.result.celkovaMezera;
   const titulek = mezera > 0
     ? `Kontrola životního pojištění – ${lead.jmeno} (mezera v krytí ${formatKc(mezera)})`
     : `Kontrola životního pojištění – ${lead.jmeno}`;
-  const leadBody: any = { title: titulek, person_id: personId };
+  const dealBody: any = { title: titulek, person_id: personId };
   if (mezera > 0) {
-    leadBody.value = { amount: mezera, currency: "CZK" };
+    dealBody.value = mezera;
+    dealBody.currency = "CZK";
   }
-  const leadRes = await fetch(`${base}/leads?${q}`, {
+  const dealRes = await fetch(`${base}/deals?${q}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(leadBody),
+    body: JSON.stringify(dealBody),
   });
-  const leadJson = await leadRes.json();
-  if (!leadRes.ok || !leadJson?.data?.id) {
-    throw new Error(`Pipedrive lead: ${leadJson?.error || leadRes.status}`);
+  const dealJson = await dealRes.json();
+  if (!dealRes.ok || !dealJson?.data?.id) {
+    throw new Error(`Pipedrive deal: ${dealJson?.error || dealRes.status}`);
   }
-  const leadId = leadJson.data.id as string;
+  const dealId = dealJson.data.id as string;
 
   // 3) Note s detailem (best-effort, neblokuje úspěch)
   try {
     await fetch(`${base}/notes?${q}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lead_id: leadId, content: leadPopis(lead).replace(/\n/g, "<br>") }),
+      body: JSON.stringify({ deal_id: dealId, content: leadPopis(lead).replace(/\n/g, "<br>") }),
     });
   } catch {
     /* ignore */
   }
 
-  return { leadId };
+  return { leadId: dealId };
 }
 
 export async function POST(req: NextRequest) {
