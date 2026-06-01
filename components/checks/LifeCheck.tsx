@@ -211,6 +211,19 @@ export default function LifeCheck() {
 
   const stepIndex = { upload: 0, extracting: 0, review: 1, result: 2, done: 3 }[step];
 
+  // Dopočet délky smlouvy z data sjednání a konce pojištění (v letech).
+  // Vrátí null, pokud chybí jedno z dat nebo je konec před začátkem.
+  function dopocitejDobu(): number | null {
+    if (!life?.datumSjednani || !life?.datumKonce) return null;
+    const od = new Date(life.datumSjednani);
+    const do_ = new Date(life.datumKonce);
+    if (Number.isNaN(od.getTime()) || Number.isNaN(do_.getTime())) return null;
+    const roky = (do_.getTime() - od.getTime()) / (365.25 * 24 * 3600 * 1000);
+    if (roky <= 0) return null;
+    return Math.round(roky);
+  }
+  const dopoctenaDoba = dopocitejDobu();
+
   // Pomocné renderery polí – ať formulář není přebujelý.
   const txt = (key: keyof ExtractedLife, label: string, placeholder?: string) => (
     <label className="field">
@@ -376,7 +389,24 @@ export default function LifeCheck() {
               </div>
               <div className="grid2">
                 {number("mesicniPojistne", "Měsíční pojistné (Kč)")}
-                {txt("dobaTrvani", "Doba trvání", 'např. "do 65 let"')}
+                <label className="field">
+                  <span>Doba trvání</span>
+                  <input
+                    className="inp"
+                    value={life.dobaTrvani ?? ""}
+                    placeholder='např. "do 65 let" nebo "30 let"'
+                    onChange={(e) => updateLife("dobaTrvani", e.target.value)}
+                  />
+                  {dopoctenaDoba !== null && (
+                    <button
+                      type="button"
+                      className="hint-btn"
+                      onClick={() => updateLife("dobaTrvani", `${dopoctenaDoba} let`)}
+                    >
+                      💡 Z dat vychází {dopoctenaDoba} let – doplnit
+                    </button>
+                  )}
+                </label>
               </div>
               <div className="grid2">
                 <label className="field">

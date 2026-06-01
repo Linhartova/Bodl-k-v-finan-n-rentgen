@@ -992,3 +992,20 @@ input.inp:focus {
     gap: 8px;
   }
 }
+
+/* Nápověda pod polem (dopočtená hodnota – klikni pro doplnění) */
+.hint-btn {
+  display: inline-block;
+  margin-top: 6px;
+  background: var(--brand-tint, #eaf6fc);
+  border: 1px solid var(--border);
+  color: var(--brand-dark);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.hint-btn:hover {
+  background: #d8eefa;
+}
